@@ -1,22 +1,24 @@
 require 'rest_client'
+require './lib/item'
 
 class SimpleFeedClient
- attr_accessor  :user, :password
+  attr_accessor  :user, :password
 
- def initialize(arg)
-  self.user = arg[:user]
-  self.password = arg[:password]
- end
+  def initialize(arg)
+    self.user = arg[:user]
+    self.password = arg[:password]
+  end
 
- def request_to
-  json = RestClient::Request.execute(:url => 'http://localhost:3000/api/feeds/tony_mckernan/items.json', 
+  def request_to
+    json = RestClient::Request.execute(:url => 'http://localhost:3000/api/feeds/tony_mckernan/items.json', 
                                      :method => 'get', 
                                      :user => user,
                                      :password => password)
- end
 
- def parse (json)
-   raw = JSON.parse(json, symbolize_names: true)
- end
+    raw_items = JSON.parse(json, symbolize_names: true)
 
+    items = raw_items.map do |post|
+      SimpleFeedClient::Item.new(post)
+    end
+  end
 end
